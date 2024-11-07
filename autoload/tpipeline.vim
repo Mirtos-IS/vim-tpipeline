@@ -120,6 +120,8 @@ func tpipeline#initialize()
 
 	let s:needs_cleanup = 0
 
+	let s:block_update = v:false
+
 	let s:is_nvim = has('nvim')
 	let s:has_modechgd = exists('##ModeChanged')
 
@@ -234,6 +236,10 @@ func tpipeline#init_statusline()
 endfunc
 
 func tpipeline#update()
+  "call inspect(s:needs_cleanup)
+  if s:block_update == v:true
+      return
+  endif
 	if s:is_nvim
 		let line = luaeval("require'tpipeline.main'.update()")
 	else
@@ -300,6 +306,7 @@ endfunc
 
 func tpipeline#forceupdate()
 	let s:needs_cleanup = 0
+	let s:block_update = v:false
 	if g:tpipeline_restore
 		call system("tmux set status-left '#(cat #{socket_path}-\\#{session_id}-vimbridge)'")
 		if g:tpipeline_split
@@ -337,6 +344,7 @@ func tpipeline#cautious_cleanup()
 endfunc
 
 func tpipeline#deferred_cleanup()
+	let s:block_update = 1
 	let s:needs_cleanup = 1
 	let s:cleanup_timer = timer_start(s:cleanup_delay, {-> tpipeline#cautious_cleanup()})
 endfunc
