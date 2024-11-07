@@ -236,7 +236,6 @@ func tpipeline#init_statusline()
 endfunc
 
 func tpipeline#update()
-  "call inspect(s:needs_cleanup)
   if s:block_update == v:true
       return
   endif
